@@ -1,0 +1,725 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./css\styles.css">
+    <link rel="stylesheet" href="./css\leaflet.css">
+    <link rel="stylesheet" href="./css\L.Control.Layers.Tree.css">
+    <link rel="stylesheet" href="./css\L.Control.Locate.min.css">
+    <link rel="stylesheet" href="./css\qgis2web.css">
+    <link rel="stylesheet" href="./css\fontawesome-all.min.css">
+    <link rel="stylesheet" href="./css\leaflet-search.css">
+    <link rel="stylesheet" href="./css\leaflet-control-geocoder.Geocoder.css">
+    <!-- link css leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <!-- link js leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sriracha&display=swap" rel="stylesheet">
+    <img src="img\1.png" alt="" width="100%"> 
+<style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+</style>
+<title>แผนที่พิกัดวัดในพระนครศรีอยุธยา</title>
+<!-- The navigation menu -->
+<div class="navbar">
+    <a href="index.html">ประวัติพระนครศรีอยุธยา</a>
+    <a href="20measure.html">พิกัด 20 วัดเก่าแก่ในพระนครศรีอยุธยา</a>
+    <a class="active" href="map.html">แผนที่พิกัดวัดในพระนครศรีอยุธยา</a>
+  </div> 
+   
+</head>
+<body>
+    <article>
+    <U><h1>ขอบเขตจังหวัดพระนครศรีอยุธยา</h1></U>
+    <center><div id="map" style="width: 70%; height: 70%"></div></center>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\qgis2web_expressions.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\L.Control.Layers.Tree.min.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\L.Control.Locate.min.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet.rotatedMarker.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet.pattern.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet-hash.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\Autolinker.min.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\rbush.min.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\labelgun.min.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\labels.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet-control-geocoder.Geocoder.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\js\leaflet-search.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\data\_1.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\data\_2.js"></script>
+    <script src="qgis2web_2024_05_12-16_54_21_909120\data\_3.js"></script>
+    <script>
+    var highlightLayer;
+    function highlightFeature(e) {
+        highlightLayer = e.target;
+
+        if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
+          highlightLayer.setStyle({
+            color: '#ffff00',
+          });
+        } else {
+          highlightLayer.setStyle({
+            fillColor: '#ffff00',
+            fillOpacity: 1
+          });
+        }
+    }
+    var map = L.map('map').setView([14.35930242879799, 100.52591762343434], 15);
+    var hash = new L.Hash(map);
+    map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+    var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+    function removeEmptyRowsFromPopupContent(content, feature) {
+     var tempDiv = document.createElement('div');
+     tempDiv.innerHTML = content;
+     var rows = tempDiv.querySelectorAll('tr');
+     for (var i = 0; i < rows.length; i++) {
+         var td = rows[i].querySelector('td.visible-with-data');
+         var key = td ? td.id : '';
+         if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+             rows[i].parentNode.removeChild(rows[i]);
+         }
+     }
+     return tempDiv.innerHTML;
+    }
+    document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+      var tagName = event.target.tagName,
+        popup = map._popup;
+      // Also check if flag is already set.
+      if (tagName === "IMG" && popup && !popup._updated) {
+        popup._updated = true; // Set flag to prevent looping.
+        popup.update();
+      }
+    }, true);
+    L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+    var bounds_group = new L.featureGroup([]);
+    function setBounds() {
+        if (bounds_group.getLayers().length) {
+            map.fitBounds(bounds_group.getBounds());
+        }
+    }
+    map.createPane('pane_ESRIGraylight_0');
+    map.getPane('pane_ESRIGraylight_0').style.zIndex = 400;
+    var layer_ESRIGraylight_0 = L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'pane_ESRIGraylight_0',
+        opacity: 1.0,
+        attribution: '',
+        minZoom: 1,
+        maxZoom: 24,
+        minNativeZoom: 0,
+        maxNativeZoom: 20
+    });
+    layer_ESRIGraylight_0;
+    map.addLayer(layer_ESRIGraylight_0);
+    function pop__1(feature, layer) {
+        layer.on({
+            mouseout: function(e) {
+                for (var i in e.target._eventParents) {
+                    if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                }
+            },
+            mouseover: highlightFeature,
+        });
+        var popupContent = '<table>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['AMP_CODE'] !== null ? autolinker.link(feature.properties['AMP_CODE'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['PRV_CODE'] !== null ? autolinker.link(feature.properties['PRV_CODE'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['AMP_NAME_T'] !== null ? autolinker.link(feature.properties['AMP_NAME_T'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['AMP_NAME_E'] !== null ? autolinker.link(feature.properties['AMP_NAME_E'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                </tr>\
+            </table>';
+        layer.bindPopup(popupContent, {maxHeight: 400});
+        var popup = layer.getPopup();
+        var content = popup.getContent();
+        var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+        popup.setContent(updatedContent);
+    }
+
+    function style__1_0(feature) {
+        switch(String(feature.properties['AMP_NAME_T'])) {
+            case 'ท่าเรือ':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(185,220,44,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'นครหลวง':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(166,206,227,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บางซ้าย':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(252,187,161,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บางไทร':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(232,113,141,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บางบาล':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(234,136,191,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บางปะหัน':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(72,174,237,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บางปะอิน':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(154,206,111,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'บ้านแพรก':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(234,63,97,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'ผักไห่':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(224,149,136,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'พระนครศรีอยุธยา':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(31,120,180,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'ภาชี':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(178,223,138,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'มหาราช':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(113,211,173,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'ลาดบัวหลวง':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(117,182,223,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'วังน้อย':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(251,154,153,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'เสนา':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(47,233,227,1.0)',
+            interactive: true,
+        }
+                break;
+            case 'อุทัย':
+                return {
+            pane: 'pane__1',
+            opacity: 1,
+            color: 'rgba(35,35,35,1.0)',
+            dashArray: '',
+            lineCap: 'butt',
+            lineJoin: 'miter',
+            weight: 2.0, 
+            fill: true,
+            fillOpacity: 1,
+            fillColor: 'rgba(200,185,97,1.0)',
+            interactive: true,
+        }
+                break;
+        }
+    }
+    map.createPane('pane__1');
+    map.getPane('pane__1').style.zIndex = 401;
+    map.getPane('pane__1').style['mix-blend-mode'] = 'normal';
+    var layer__1 = new L.geoJson(json__1, {
+        attribution: '',
+        interactive: true,
+        dataVar: 'json__1',
+        layerName: 'layer__1',
+        pane: 'pane__1',
+        onEachFeature: pop__1,
+        style: style__1_0,
+    });
+    bounds_group.addLayer(layer__1);
+    map.addLayer(layer__1);
+    function pop__2(feature, layer) {
+        layer.on({
+            mouseout: function(e) {
+                for (var i in e.target._eventParents) {
+                    if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                }
+            },
+            mouseover: highlightFeature,
+        });
+        var popupContent = '<table>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['ROAD_TYPE'] !== null ? autolinker.link(feature.properties['ROAD_TYPE'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['ROAD_NUM'] !== null ? autolinker.link(feature.properties['ROAD_NUM'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['NAME_T'] !== null ? autolinker.link(feature.properties['NAME_T'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['NAME_E'] !== null ? autolinker.link(feature.properties['NAME_E'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['SURFACE'] !== null ? autolinker.link(feature.properties['SURFACE'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['WIDTH'] !== null ? autolinker.link(feature.properties['WIDTH'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['LANE'] !== null ? autolinker.link(feature.properties['LANE'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['ONEWAY'] !== null ? autolinker.link(feature.properties['ONEWAY'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['SHAPE_LENG'] !== null ? autolinker.link(feature.properties['SHAPE_LENG'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['LENGTH'] !== null ? autolinker.link(feature.properties['LENGTH'].toLocaleString()) : '') + '</td>\
+                </tr>\
+            </table>';
+        layer.bindPopup(popupContent, {maxHeight: 400});
+        var popup = layer.getPopup();
+        var content = popup.getContent();
+        var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+        popup.setContent(updatedContent);
+    }
+
+    function style__2_0() {
+        return {
+            pane: 'pane__2',
+            opacity: 1,
+            color: 'rgba(213,180,60,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 2.0,
+            fillOpacity: 0,
+            interactive: true,
+        }
+    }
+    map.createPane('pane__2');
+    map.getPane('pane__2').style.zIndex = 402;
+    map.getPane('pane__2').style['mix-blend-mode'] = 'normal';
+    var layer__2 = new L.geoJson(json__2, {
+        attribution: '',
+        interactive: true,
+        dataVar: 'json__2',
+        layerName: 'layer__2',
+        pane: 'pane__2',
+        onEachFeature: pop__2,
+        style: style__2_0,
+    });
+    bounds_group.addLayer(layer__2);
+    map.addLayer(layer__2);
+    function pop__3(feature, layer) {
+        layer.on({
+            mouseout: function(e) {
+                for (var i in e.target._eventParents) {
+                    if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                }
+            },
+            mouseover: highlightFeature,
+        });
+        var popupContent = '<table>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['hy_use'] !== null ? autolinker.link(feature.properties['hy_use'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['hy_mriver'] !== null ? autolinker.link(feature.properties['hy_mriver'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['str_id'] !== null ? autolinker.link(feature.properties['str_id'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['str_type'] !== null ? autolinker.link(feature.properties['str_type'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['str_name_t'] !== null ? autolinker.link(feature.properties['str_name_t'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['str_name_e'] !== null ? autolinker.link(feature.properties['str_name_e'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['mod_date'] !== null ? autolinker.link(feature.properties['mod_date'].toLocaleString()) : '') + '</td>\
+                </tr>\
+                <tr>\
+                    <td colspan="2">' + (feature.properties['length'] !== null ? autolinker.link(feature.properties['length'].toLocaleString()) : '') + '</td>\
+                </tr>\
+            </table>';
+        layer.bindPopup(popupContent, {maxHeight: 400});
+        var popup = layer.getPopup();
+        var content = popup.getContent();
+        var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+        popup.setContent(updatedContent);
+    }
+
+    function style__3_0() {
+        return {
+            pane: 'pane__3',
+            opacity: 1,
+            color: 'rgba(83,123,180,1.0)',
+            dashArray: '',
+            lineCap: 'square',
+            lineJoin: 'bevel',
+            weight: 2.0,
+            fillOpacity: 0,
+            interactive: true,
+        }
+    }
+    map.createPane('pane__3');
+    map.getPane('pane__3').style.zIndex = 403;
+    map.getPane('pane__3').style['mix-blend-mode'] = 'normal';
+    var layer__3 = new L.geoJson(json__3, {
+        attribution: '',
+        interactive: true,
+        dataVar: 'json__3',
+        layerName: 'layer__3',
+        pane: 'pane__3',
+        onEachFeature: pop__3,
+        style: style__3_0,
+    });
+    bounds_group.addLayer(layer__3);
+    map.addLayer(layer__3);
+    var osmGeocoder = new L.Control.Geocoder({
+        collapsed: true,
+        position: 'topleft',
+        text: 'Search',
+        title: 'Testing'
+    }).addTo(map);
+    document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+    .className += ' fa fa-search';
+    document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+    .title += 'Search for a place';
+    var baseMaps = {};
+    var overlaysTree = [
+        {label: '<img src="css\legend\_3.png" /> แหล่งน้ำ', layer: layer__3},
+        {label: '<img src="css\legend\_2.png" /> ถนน', layer: layer__2},
+        {label: 'จังหวัดพระนครศรีอยุธยา<br /><table><tr><td style="text-align: center;"><img src="css\legend\_1_ทาเรอ0.png" /></td><td>ท่าเรือ</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_นครหลวง1.png" /></td><td>นครหลวง</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บางซาย2.png" /></td><td>บางซ้าย</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บางไทร3.png" /></td><td>บางไทร</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บางบาล4.png" /></td><td>บางบาล</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บางปะหน5.png" /></td><td>บางปะหัน</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บางปะอน6.png" /></td><td>บางปะอิน</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_บานแพรก7.png" /></td><td>บ้านแพรก</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_ผกไห8.png" /></td><td>ผักไห่</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_พระนครศรอยธยา9.png" /></td><td>พระนครศรีอยุธยา</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_ภาช10.png" /></td><td>ภาชี</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_มหาราช11.png" /></td><td>มหาราช</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_ลาดบวหลวง12.png" /></td><td>ลาดบัวหลวง</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_วงนอย13.png" /></td><td>วังน้อย</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_เสนา14.png" /></td><td>เสนา</td></tr><tr><td style="text-align: center;"><img src="css\legend\_1_อทย15.png" /></td><td>อุทัย</td></tr></table>', layer: layer__1},
+        {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0},]
+    var lay = L.control.layers.tree(null, overlaysTree,{
+        //namedToggle: true,
+        //selectorBack: false,
+        //closedSymbol: '&#8862; &#x1f5c0;',
+        //openedSymbol: '&#8863; &#x1f5c1;',
+        //collapseAll: 'Collapse all',
+        //expandAll: 'Expand all',
+        collapsed: true,
+    });
+    lay.addTo(map);
+    setBounds();
+    var i = 0;
+    layer__1.eachLayer(function(layer) {
+        var context = {
+            feature: layer.feature,
+            variables: {}
+        };
+        layer.bindTooltip((layer.feature.properties['AMP_NAME_T'] !== null?String('<div style="color: #323232; font-size: 10pt; font-weight: bold; font-family: \'Angsana New\', sans-serif;">' + layer.feature.properties['AMP_NAME_T']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css__1'});
+        labels.push(layer);
+        totalMarkers += 1;
+          layer.added = true;
+          addLabel(layer, i);
+          i++;
+    });
+    map.addControl(new L.Control.Search({
+        layer: layer__1,
+        initial: false,
+        hideMarkerOnCollapse: true,
+        propertyName: 'AMP_NAME_T'}));
+    document.getElementsByClassName('search-button')[0].className +=
+     ' fa fa-binoculars';
+    resetLabels([layer__1]);
+    map.on("zoomend", function(){
+        resetLabels([layer__1]);
+    });
+    map.on("layeradd", function(){
+        resetLabels([layer__1]);
+    });
+    map.on("layerremove", function(){
+        resetLabels([layer__1]);
+    });
+    
+</script>
+<hr>
+    <!-- แบ่งส่วนหน้าจอ -->
+    <article>
+        <U><h1>แผนที่แสดงพิกัด 20 วัดเก่าแก่</h1></U>
+    <center><div id="measure" style="width: 70%; height: 70%"></div></center>
+    <script>
+        //set view map
+        var map = L.map('measure').setView([14.35930242879799, 100.52591762343434], 13);
+        //import based map
+        var OSM = L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+         maxZoom: 18,
+         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        var Esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+         attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+         maxZoom: 16
+        }).addTo(map);
+        var Stadia = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.{ext}', {
+	    minZoom: 0,
+	     maxZoom: 20,
+	    attribution: '&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	    ext: 'jpg'
+        }).addTo(map);
+        
+        var baseLayers = {
+            "Esri" : Esri,
+            "Stadia" : Stadia,
+            "OSM" : OSM,
+        }
+        L.control.layers(baseLayers).addTo(map);
+        
+        
+var ayuttaya = [
+["<b>วัดกษัตราธิราชวรวิหาร</b><br>จังหวัดพระนครศรีอยุธยา", 14.3516270655422, 100.544383673013],
+["<b>วัดนิเวศธรรมประวัติราชวรวิหาร</b><br>จังหวัดพระนครศรีอยุธยา", 14.2317646880625, 100.576243166266],
+["<b>วัดมหาธาตุ</b><br>จังหวัดพระนครศรีอยุธยา", 14.3571157971694, 100.567462920239],
+["<b>วัดแม่นางปลื้ม</b><br>จังหวัดพระนครศรีอยุธยา", 14.3683797750347, 100.569453593253],
+["<b>วัดพระราม</b><br>จังหวัดพระนครศรีอยุธยา", 14.3542615445146, 100.560521562568],
+["<b>วัดสุวรรณดารารามราชวรวิหาร</b><br>จังหวัดพระนครศรีอยุธยา", 14.3486643036425, 100.57842987976],
+["<b>วัดภูเขาทอง</b><br>จังหวัดพระนครศรีอยุธยา", 14.368421722277, 100.539113747226],
+["<b>วัดกุฎีดาว</b><br>จังหวัดพระนครศรีอยุธยา",14.3635026047657, 100.589950263817],
+["<b>วิหารพระมงคลบพิตร</b><br>จังหวัดพระนครศรีอยุธยา", 14.355104092576, 100.557720377911],
+["<b>วัดมเหยงคณ์</b><br>จังหวัดพระนครศรีอยุธยา", 14.3639110592494, 100.595016677911],
+["<b>วัดใหญ่ชัยมงคล </b><br>จังหวัดพระนครศรีอยุธยา", 14.56391, 100.7715],
+["<b>วัดพนัญเชิง</b><br>จังหวัดพระนครศรีอยุธยา", 14.34467, 100.5789],
+["<b>วัดพระศรีสรรเพชญ์</b><br>จังหวัดพระนครศรีอยุธยา", 14.35634, 100.55816],
+["<b>วัดหน้าพระเมรุ</b><br>จังหวัดพระนครศรีอยุธยา", 14.36325,100.5588],
+["<b>วัดไชยวัฒนาราม</b><br>จังหวัดพระนครศรีอยุธยา", 14.34381, 100.54182],
+["<b>วัดราชบูรณะ</b><br>จังหวัดพระนครศรีอยุธยา", 14.35949, 100.56742],
+["<b>วัดท่าการ้อง</b><br>จังหวัดพระนครศรีอยุธยา", 14.35887, 100.54348],
+["<b>วัดธรรมิกราช</b><br>จังหวัดพระนครศรีอยุธยา",14.36023, 100.56154],
+["<b>วัดเชิงท่า</b><br>จังหวัดพระนครศรีอยุธยา", 14.36297, 100.5537],
+["<b>วัดพุทไทยสวรรค์</b><br>จังหวัดพระนครศรีอยุธยา", 14.34052, 100.55837],
+];
+
+//เปลี่ยน icon
+var greenIcon = L.icon({
+iconUrl: 'img\pin.png',
+//shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+
+iconSize: [, 35], // size of the icon
+//shadowSize: [50, 64], // size of the shadow
+iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+//shadowAnchor: [4, 62], // the same for the shadow
+popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+for (var i = 0; i < ayuttaya.length; i++) {
+
+marker = new L.marker([ayuttaya[i][1], ayuttaya[i][2]], {icon: greenIcon})
+    .bindPopup(ayuttaya[i][0])
+    .addTo(map);
+}
+
+//description/Legend
+var legend = L.control({position:"bottomleft"});
+legend.onAdd = function(measure) {
+var div = L.DomUtil.create("div", "legend");
+div.innerHTML = 
+'<p><b>คำอธิบายสัญลักษณ์</p></b>' +
+'<img src ="img\pin.png" width = 10%<b>วัดเก่าแก่ในอยุธยา</b><hr>' +
+'<h3><b>Srinakharinwirot university</b></h3><hr>' +
+'<b>Created by Kankullanach Kanyaprasit<br>Atcharaphon Promjun<br>Potnicha Phetchnin </b><br>' +
+'<b>ID: 64103010274,64103010327,64103010861</b><br>'+
+'<img src="img\SWU_Logo_EN_Color.png" width = 40%>';
+return div;
+};
+legend.addTo(map);
+
+    </script>
+     </body>
+</html>
